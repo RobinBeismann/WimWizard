@@ -2556,7 +2556,20 @@ try {
     $scriptLines += '# correct language satellites for the user''s configured language.'
     $scriptLines += "# Generated: $(Get-Date -Format 'yyyy-MM-dd HH:mm') by WimWizard v$ScriptVersion"
     $scriptLines += ''
-    $scriptLines += '$log = "C:\ProgramData\WimWizard\InstallSystemApps.log"'
+    $scriptLines += "Add-Type -Name Window -Namespace Console -MemberDefinition '"
+    $scriptLines += '[DllImport("Kernel32.dll")]'
+    $scriptLines += 'public static extern IntPtr GetConsoleWindow();'
+    $scriptLines += '[DllImport("user32.dll")]'
+    $scriptLines += "public static extern bool ShowWindow(IntPtr hWnd, Int32 nCmdShow);'"
+    $scriptLines += ''
+    $scriptLines += '$console = [Console.Window]::GetConsoleWindow()'
+    $scriptLines += '[Console.Window]::ShowWindow($console, 0) | Out-Null'
+    $scriptLines += ''
+    $scriptLines += '$logPath = "$env:LOCALAPPDATA\WimWizard"'
+    $scriptLines += ''
+    $scriptLines += '$null = New-Item -Type Directory -Force -Path $logPath'
+    $scriptLines += ''
+    $scriptLines += '$log = "$logPath\InstallSystemApps.log"'
     $scriptLines += 'function Write-Log { param([string]$msg) $ts = Get-Date -Format "HH:mm:ss"; Add-Content $log "[$ts] $msg" }'
     $scriptLines += ''
     $scriptLines += 'Write-Log "=== InstallSystemApps starting ==="'
